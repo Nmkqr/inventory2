@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>صفحة منتج — قالب ديناميكي</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#0f172a;
+      --muted:#94a3b8;
+      --text:#e2e8f0;
+      --accent:#60a5fa;
+      --accent-2:#7dd3fc;
+      --danger:#ef4444;
+      --ok:#22c55e;
+      --price:#f43f5e;
+      --star:#f59e0b;
+      --chip:#172554;
+      --radius:18px;
+      --shadow:0 8px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:20px;
+      background: radial-gradient(1200px 600px at 90% -10%, #1d283a, transparent 50%),
+                  radial-gradient(1200px 600px at -10% 110%, #121a2b, transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      font-family: "Noto Kufi Arabic", Tahoma, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      display:grid; place-items:center; min-height:100dvh;
+    }
+    .container{ width:min(980px,100%); }
+    .card{
+      background: linear-gradient(180deg,#0b1224 0%, #0d1430 60%, #0f172a 100%);
+      border:1px solid #1f2a44;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .grid{ display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+    @media (max-width:880px){ .grid{ grid-template-columns: 1fr; } }
+    .media{
+      background:#0b1224; padding:16px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .hero{
+      width:100%; aspect-ratio:1/1; border-radius: 14px; overflow:hidden;
+      background:#0b1224; border:1px solid #1e293b;
+      display:grid; place-items:center;
+    }
+    .hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumbs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .thumbs img{
+      width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;
+      border:1px solid #1e293b; cursor:pointer; opacity:.9; transition:.2s;
+    }
+    .thumbs img:hover{ transform: translateY(-2px); opacity:1; }
+    .content{ padding:20px 20px 24px; }
+    .brand-row{
+      display:flex; align-items:center; gap:12px; margin-bottom:6px;
+    }
+    .brand-row img{ width:28px; height:28px; object-fit:contain; border-radius:6px; background:#0b1224; border:1px solid #1e293b; }
+    h1{ margin:6px 0 10px; font-size:26px; line-height:1.5; }
+    .muted{ color:var(--muted); font-size:13px; }
+    .badge{
+      display:inline-block; padding:4px 10px; border-radius:999px; background:var(--chip);
+      color:#9bd2ff; border:1px solid #1e3a8a; font-size:12px; font-weight:700;
+    }
+    .price-row{ display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
+    .price{ font-size:24px; font-weight:900; color:var(--price); }
+    del{ color:#64748b; }
+    .rating{ display:flex; align-items:center; gap:8px; margin:8px 0 14px; color:var(--muted); }
+    .stars{ color:var(--star); letter-spacing:2px; }
+    .stock{ margin:6px 0 14px; }
+    .stock .ok{ color:var(--ok); }
+    .stock .no{ color:var(--danger); }
+    .desc{ font-size:15px; line-height:1.9; margin:10px 0 18px; color:#cfe6ff; }
+    .cta{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+    @media (max-width:520px){ .cta{ grid-template-columns: 1fr; } }
+    .btn{
+      display:inline-block; text-align:center; padding:12px 14px; border-radius:12px;
+      text-decoration:none; font-weight:800; background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#0b1324; transition:.08s; border:1px solid #1d4ed8;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-secondary{ background:#0c1224; color:#cbd5e1; border:1px solid #203056; }
+    .meta{ margin-top:12px; font-size:12px; color:var(--muted); }
+    .footer-note{ text-align:center; margin-top:14px; font-size:12px; color:#8aa7c9; }
+    .err, .loading{
+      background:#0b1224; border:1px dashed #334155; padding:16px; border-radius:12px; color:#cbd5e1;
+    }
+    .hidden{ display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="grid">
+        <section class="media">
+          <div class="hero" id="hero"><span class="muted">— صورة المنتج —</span></div>
+          <div class="thumbs" id="thumbs"></div>
+        </section>
+        <section class="content">
+          <div class="brand-row">
+            <img id="brandLogo" alt="الشعار" onerror="this.classList.add('hidden')" />
+            <span class="badge" id="brandName">—</span>
+          </div>
+          <h1 id="title">—</h1>
+          <div class="price-row">
+            <span class="price" id="priceCurrent">—</span>
+            <del id="priceOriginal" class="hidden">—</del>
+            <span class="badge" id="discountBadge" class="hidden"></span>
+          </div>
+          <div class="rating">
+            <span class="stars" id="stars">★★★★★</span>
+            <span id="ratingText" class="muted">—</span>
+          </div>
+          <div class="stock">
+            <span class="ok hidden" id="inStock">متوفر الآن</span>
+            <span class="no hidden" id="outStock">نفد من المخزون</span>
+          </div>
+          <p class="desc" id="desc">—</p>
+          <div class="cta">
+            <a class="btn" id="buyBtn" href="#" target="_blank" rel="noopener">اشترِ الآن</a>
+            <a class="btn btn-secondary" id="cartBtn" href="#" target="_blank" rel="noopener">إضافة للسلة</a>
+          </div>
+          <div class="meta" id="meta">SKU: —</div>
+          <div id="info" class="loading hidden">جاري تحميل بيانات المنتج…</div>
+          <div id="error" class="err hidden">تعذر تحميل بيانات هذا المنتج. تأكد من صحة الرمز أو حاول لاحقًا.</div>
+        </section>
+      </div>
+    </div>
+    <div class="footer-note">قالب ديناميكي — يقرأ المنتج حسب ?sku= — يدعم JSON أو Google Sheet CSV — بدون مكتبات خارجية</div>
+  </div>
+
+<script>
+/** ====================
+ *  ✅ الإعدادات العامة
+ *  ==================== */
+const CONFIG = {
+  // نوع مصدر البيانات: 'json' أو 'gsheet_csv'
+  DATA_SOURCE: 'json',
+
+  // 1) لو JSON: يقبل Array of objects أو Object keyed by product_id
+ JSON_URL: 'products_map.json', // غيّرها لمسارك الفعلي (CDN/S3)
+
+  // 2) لو Google Sheet CSV: ضع رابط export?format=csv
+  GSHEET_CSV_URL: 'https://docs.google.com/spreadsheets/d/<<SHEET_ID>>/export?format=csv',
+
+  // خانة الرابط للشراء داخل كل عنصر
+  PRODUCT_URL_FIELD: 'product_url', // استخدم هذا الحقل إن وجد داخل الداتا
+
+  // Webhook تحليلات اختياري (يستقبل زيارة الصفحة)
+  ANALYTICS_WEBHOOK: '', // مثال: 'https://n8n.example.com/webhook/track',
+
+  // إضافات
+  CURRENCY_FALLBACK: 'SAR',
+};
+
+/** Helpers */
+const qs = new URLSearchParams(location.search);
+const SKU = (qs.get('sku') || '').trim();
+const BRANCH = (qs.get('branch') || '').trim();
+
+function fmtPrice(v){
+  if (v == null || v === '') return '';
+  const num = Number(String(v).replace(/[^\d.\-]/g,''));
+  if (!Number.isFinite(num)) return String(v);
+  return num.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function starString(r){
+  const n = Math.max(0, Math.min(5, Number(r)||0));
+  const full = '★★★★★'.slice(0, Math.round(n));
+  const empty = '☆☆☆☆☆'.slice(Math.round(n));
+  return full + empty;
+}
+function el(id){ return document.getElementById(id); }
+function show(id){ el(id).classList.remove('hidden'); }
+function hide(id){ el(id).classList.add('hidden'); }
+
+/** CSV Parser (يدعم الفواصل داخل علامات اقتباس) */
+function parseCSV(csv){
+  const rows = [];
+  let row = [], cell = '', inQuotes = false;
+  for (let i=0;i<csv.length;i++){
+    const c = csv[i], n = csv[i+1];
+    if (c === '"'){
+      if (inQuotes && n === '"'){ cell += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (c === ',' && !inQuotes){
+      row.push(cell); cell='';
+    } else if ((c === '\n' || c === '\r') && !inQuotes){
+      if (cell !== '' || row.length){ row.push(cell); rows.push(row); row=[]; cell=''; }
+      if (c === '\r' && n === '\n') i++;
+    } else {
+      cell += c;
+    }
+  }
+  if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  const header = rows.shift().map(h => h.trim());
+  return rows.map(r => Object.fromEntries(header.map((h,idx)=>[h, (r[idx]||'').trim() ])));
+}
+
+/** تحميل المصدر */
+async function loadProducts(){
+  if (CONFIG.DATA_SOURCE === 'json'){
+    const res = await fetch(CONFIG.JSON_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('JSON load failed');
+    const data = await res.json();
+    if (Array.isArray(data)){
+      const map = Object.create(null);
+      for (const item of data){
+        const id = (item.product_id || item.sku || '').toString().trim();
+        if (id) map[id] = item;
+      }
+      return map;
+    } else {
+      return data; // مفترض: keyed by product_id
+    }
+  } else if (CONFIG.DATA_SOURCE === 'gsheet_csv'){
+    const res = await fetch(CONFIG.GSHEET_CSV_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('CSV load failed');
+    const csv = await res.text();
+    const arr = parseCSV(csv);
+    const map = Object.create(null);
+    for (const item of arr){
+      const id = (item.product_id || item.sku || '').toString().trim();
+      if (id) map[id] = item;
+    }
+    return map;
+  } else {
+    throw new Error('Unknown DATA_SOURCE');
+  }
+}
+
+/** عرض المنتج */
+function renderProduct(p){
+  // عناصر DOM
+  const brandLogo = el('brandLogo');
+  const brandName = el('brandName');
+  const title = el('title');
+  const priceCurrent = el('priceCurrent');
+  const priceOriginal = el('priceOriginal');
+  const discountBadge = el('discountBadge');
+  const ratingText = el('ratingText');
+  const stars = el('stars');
+  const inStock = el('inStock');
+  const outStock = el('outStock');
+  const desc = el('desc');
+  const meta = el('meta');
+  const buyBtn = el('buyBtn');
+  const cartBtn = el('cartBtn');
+  const hero = el('hero');
+  const thumbs = el('thumbs');
+
+  // صور
+  const imgs = [p.image_url1, p.image_url2, p.image_url3, p.image_url4].filter(Boolean);
+  hero.innerHTML = '';
+  const main = document.createElement('img');
+  main.alt = p.title_ar || 'صورة المنتج';
+  main.src = imgs[0] || p.img_url || '';
+  hero.appendChild(main);
+  thumbs.innerHTML = '';
+  imgs.forEach((u,i)=>{
+    const t = document.createElement('img');
+    t.src = u; t.alt = 'صورة ' + (i+1);
+    t.addEventListener('click', ()=>{ main.src = u; });
+    thumbs.appendChild(t);
+  });
+
+  // عنوان / براند
+  title.textContent = p.title_ar || '—';
+  brandName.textContent = p.brand || '—';
+  if (p.brand_logo){ brandLogo.src = p.brand_logo; brandLogo.classList.remove('hidden'); }
+
+  // السعر
+  const curr = p.currency || CONFIG.CURRENCY_FALLBACK || 'SAR';
+  priceCurrent.textContent = `${fmtPrice(p.price_current)} ${curr}`;
+  const hasOriginal = Number(p.price_original) && Number(p.price_original) > Number(p.price_current||0);
+  if (hasOriginal){
+    priceOriginal.textContent = `${fmtPrice(p.price_original)} ${curr}`;
+    priceOriginal.classList.remove('hidden');
+  }
+  if (p.discount_percentage){
+    discountBadge.textContent = `خصم ${String(p.discount_percentage).replace('%','')}%`;
+    discountBadge.classList.remove('hidden');
+  }
+
+  // التقييم
+  const r = Number(p.rating || 0);
+  stars.textContent = starString(r);
+  ratingText.textContent = `${r || '—'}/5 • ${p.total_reviews || 0} مراجعات`;
+
+  // المخزون
+  if ((p.stock_status || '').toLowerCase().includes('out') || p.stock_status === 'غير متوفر'){
+    show('outStock'); hide('inStock');
+  } else {
+    show('inStock'); hide('outStock');
+  }
+
+  // وصف
+  desc.textContent = p.short_description || '';
+
+  // أزرار
+  const url = p[CONFIG.PRODUCT_URL_FIELD] || p.product_url || '#';
+  buyBtn.href = url;
+  cartBtn.href = url;
+
+  // ميتا
+  meta.textContent = `SKU: ${p.product_id || p.sku || '—'} ${BRANCH ? '• الفرع: '+BRANCH : ''}`;
+
+  // JSON-LD (اختياري)
+  const ld = {
+    "@context":"https://schema.org/",
+    "@type":"Product",
+    "name": p.title_ar || '',
+    "image": imgs.length ? imgs : (p.img_url ? [p.img_url] : []),
+    "brand": {"@type":"Brand","name":p.brand||''},
+    "sku": p.product_id || p.sku || '',
+    "description": p.short_description || '',
+    "offers": {
+      "@type":"Offer",
+      "priceCurrency": curr,
+      "price": String(p.price_current||''),
+      "availability": ((p.stock_status||'').includes('نفد') || (p.stock_status||'').toLowerCase().includes('out')) ?
+                      "https://schema.org/OutOfStock" : "https://schema.org/InStock"
+    },
+    "aggregateRating": (p.rating||p.total_reviews) ? {
+      "@type":"AggregateRating",
+      "ratingValue": String(p.rating||''),
+      "reviewCount": String(p.total_reviews||'')
+    } : undefined
+  };
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(ld);
+  document.body.appendChild(script);
+}
+
+/** تسجيل Analytics اختياري */
+async function trackVisit(p){
+  if (!CONFIG.ANALYTICS_WEBHOOK) return;
+  try{
+    await fetch(CONFIG.ANALYTICS_WEBHOOK, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        event:'product_view', sku: p.product_id || p.sku || SKU,
+        branch: BRANCH || null,
+        ts: new Date().toISOString(),
+        ua: navigator.userAgent,
+        ref: document.referrer || null
+      })
+    });
+  }catch(e){ /* silent */ }
+}
+
+/** Main */
+(async function init(){
+  if (!SKU){ hide('info'); show('error'); el('error').textContent = 'لم يتم تمرير sku في الرابط (?sku=).'; return; }
+  show('info'); hide('error');
+  try{
+    const map = await loadProducts();
+    const p = map[SKU];
+    if (!p){ hide('info'); show('error'); el('error').textContent = 'لم يتم العثور على المنتج المطلوب.'; return; }
+    hide('info');
+    renderProduct(p);
+    trackVisit(p);
+  }catch(err){
+    hide('info'); show('error'); console.error(err);
+  }
+})();
+</script>
+</body>
+</html>
