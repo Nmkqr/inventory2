@@ -4,94 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>صفحة منتج — قالب ديناميكي</title>
-  <style>
-    :root{
-      --bg:#0b1020;
-      --card:#0f172a;
-      --muted:#94a3b8;
-      --text:#e2e8f0;
-      --accent:#60a5fa;
-      --accent-2:#7dd3fc;
-      --danger:#ef4444;
-      --ok:#22c55e;
-      --price:#f43f5e;
-      --star:#f59e0b;
-      --chip:#172554;
-      --radius:18px;
-      --shadow:0 8px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; padding:20px;
-      background: radial-gradient(1200px 600px at 90% -10%, #1d283a, transparent 50%),
-                  radial-gradient(1200px 600px at -10% 110%, #121a2b, transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      font-family: "Noto Kufi Arabic", Tahoma, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      display:grid; place-items:center; min-height:100dvh;
-    }
-    .container{ width:min(980px,100%); }
-    .card{
-      background: linear-gradient(180deg,#0b1224 0%, #0d1430 60%, #0f172a 100%);
-      border:1px solid #1f2a44;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .grid{ display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
-    @media (max-width:880px){ .grid{ grid-template-columns: 1fr; } }
-    .media{
-      background:#0b1224; padding:16px;
-      display:flex; flex-direction:column; gap:12px;
-    }
-    .hero{
-      width:100%; aspect-ratio:1/1; border-radius: 14px; overflow:hidden;
-      background:#0b1224; border:1px solid #1e293b;
-      display:grid; place-items:center;
-    }
-    .hero img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .thumbs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-    .thumbs img{
-      width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;
-      border:1px solid #1e293b; cursor:pointer; opacity:.9; transition:.2s;
-    }
-    .thumbs img:hover{ transform: translateY(-2px); opacity:1; }
-    .content{ padding:20px 20px 24px; }
-    .brand-row{
-      display:flex; align-items:center; gap:12px; margin-bottom:6px;
-    }
-    .brand-row img{ width:28px; height:28px; object-fit:contain; border-radius:6px; background:#0b1224; border:1px solid #1e293b; }
-    h1{ margin:6px 0 10px; font-size:26px; line-height:1.5; }
-    .muted{ color:var(--muted); font-size:13px; }
-    .badge{
-      display:inline-block; padding:4px 10px; border-radius:999px; background:var(--chip);
-      color:#9bd2ff; border:1px solid #1e3a8a; font-size:12px; font-weight:700;
-    }
-    .price-row{ display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
-    .price{ font-size:24px; font-weight:900; color:var(--price); }
-    del{ color:#64748b; }
-    .rating{ display:flex; align-items:center; gap:8px; margin:8px 0 14px; color:var(--muted); }
-    .stars{ color:var(--star); letter-spacing:2px; }
-    .stock{ margin:6px 0 14px; }
-    .stock .ok{ color:var(--ok); }
-    .stock .no{ color:var(--danger); }
-    .desc{ font-size:15px; line-height:1.9; margin:10px 0 18px; color:#cfe6ff; }
-    .cta{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
-    @media (max-width:520px){ .cta{ grid-template-columns: 1fr; } }
-    .btn{
-      display:inline-block; text-align:center; padding:12px 14px; border-radius:12px;
-      text-decoration:none; font-weight:800; background:linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:#0b1324; transition:.08s; border:1px solid #1d4ed8;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn-secondary{ background:#0c1224; color:#cbd5e1; border:1px solid #203056; }
-    .meta{ margin-top:12px; font-size:12px; color:var(--muted); }
-    .footer-note{ text-align:center; margin-top:14px; font-size:12px; color:#8aa7c9; }
-    .err, .loading{
-      background:#0b1224; border:1px dashed #334155; padding:16px; border-radius:12px; color:#cbd5e1;
-    }
-    .hidden{ display:none !important; }
-  </style>
+ <style>
+  :root{
+    --bg:#6e2f3c;          /* خلفية أساسية */
+    --card:#8a3f4d;        /* كارت موف وردي */
+    --muted:#e3b6b4;       /* نصوص ثانوية */
+    --text:#fff8f8;        /* نصوص أساسية */
+    --accent:#d96c7b;      /* زر رئيسي */
+    --accent-2:#f09aa8;    /* زر ثانوي */
+    --danger:#ef4444;      /* أحمر للتنبيهات */
+    --ok:#22c55e;          /* أخضر للتوفر */
+    --price:#ec8c96;       /* لون السعر */
+    --star:#f6d98e;        /* لون النجوم */
+    --chip:#5c1e2a;        /* خلفية البادجات */
+    --radius:18px;
+    --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0; padding:20px;
+    background:
+      radial-gradient(1200px 600px at 90% -10%, var(--chip), transparent 50%),
+      radial-gradient(1200px 600px at -10% 110%, var(--bg), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:"Noto Kufi Arabic", Tahoma, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    display:grid; place-items:center; min-height:100dvh;
+  }
+
+  .container{ width:min(980px,100%); }
+
+  .card{
+    background: linear-gradient(180deg,var(--card) 0%, var(--bg) 100%);
+    border:1px solid #a0515f;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+
+  .grid{ display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+  @media (max-width:880px){ .grid{ grid-template-columns: 1fr; } }
+
+  .media{ background:#5a2731; padding:16px; display:flex; flex-direction:column; gap:12px; }
+
+  .hero{
+    width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+    background:var(--card); border:1px solid #a0515f;
+    display:grid; place-items:center;
+  }
+  .hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .thumbs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .thumbs img{
+    width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;
+    border:1px solid var(--accent); cursor:pointer; opacity:.85; transition:.2s;
+  }
+  .thumbs img:hover{ transform: translateY(-2px); opacity:1; }
+
+  .content{ padding:20px 20px 24px; }
+
+  .brand-row{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .brand-row img{ width:28px; height:28px; object-fit:contain; border-radius:6px; background:#fff; border:1px solid var(--accent); }
+
+  h1{ margin:6px 0 10px; font-size:26px; line-height:1.5; }
+  .muted{ color:var(--muted); font-size:13px; }
+
+  .badge{
+    display:inline-block; padding:4px 10px; border-radius:999px;
+    background:var(--chip); color:var(--accent-2);
+    border:1px solid var(--accent); font-size:12px; font-weight:700;
+  }
+
+  .price-row{ display:flex; align-items:baseline; gap:10px; margin:12px 0 2px; flex-wrap:wrap; }
+  .price{ font-size:24px; font-weight:900; color:var(--price); }
+  del{ color:#f3d4d7; }
+
+  .rating{ display:flex; align-items:center; gap:8px; margin:8px 0 14px; color:var(--muted); }
+  .stars{ color:var(--star); letter-spacing:2px; }
+
+  .stock{ margin:6px 0 14px; }
+  .stock .ok{ color:var(--ok); }
+  .stock .no{ color:var(--danger); }
+
+  .desc{ font-size:15px; line-height:1.9; margin:10px 0 18px; color:#ffe9ec; }
+
+  .cta{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+  @media (max-width:520px){ .cta{ grid-template-columns: 1fr; } }
+
+  .btn{
+    display:inline-block; text-align:center; padding:12px 14px; border-radius:12px;
+    text-decoration:none; font-weight:800;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff; transition:.08s; border:1px solid var(--accent);
+  }
+  .btn:active{ transform: translateY(1px); }
+
+  .btn-secondary{ background:var(--chip); color:var(--accent-2); border:1px solid var(--accent); }
+
+  .meta{ margin-top:12px; font-size:12px; color:var(--muted); }
+  .footer-note{ text-align:center; margin-top:14px; font-size:12px; color:var(--muted); }
+
+  .err, .loading{ background:var(--card); border:1px dashed var(--accent); padding:16px; border-radius:12px; color:var(--text); }
+  .hidden{ display:none !important; }
+</style>
 </head>
 <body>
   <div class="container">
